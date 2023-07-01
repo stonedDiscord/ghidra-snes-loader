@@ -18,24 +18,29 @@ import snesloader.RomReader.RomChunk;
 
 public class LoRomLoader implements RomInfoProvider {
 	public static final long SNES_HEADER_OFFSET = 0x7FC0;
-	public static final long MAX_ROM_SIZE = 0x40_0000;
-	public static final int ROM_CHUNK_SIZE = 0x8000;
+	public static final long MAX_ROM_SIZE = 0x40_0000; //4 MiB
+	public static final int ROM_CHUNK_SIZE = 0x8000; //32 KiB
 
 	public static boolean load(ByteProvider provider, LoadSpec loadSpec, List<Option> options, MessageLog log,
 			Program prog, TaskMonitor monitor, RomInfo romInfo) throws IOException {
+		
 		AddressSpace busSpace = prog.getAddressFactory().getDefaultAddressSpace();
 
 		RomReader reader = new RomReader(romInfo, provider);
+		
 		for (RomChunk romChunk : reader) {
+			//get both the primary and mirrored (if applicable) address for each 32KiB chunk
 			List<Address> busAddresses = getBusAddressesForRomChunk(romChunk, busSpace);
 
 			String primaryBlockName = getRomChunkPrimaryName(romChunk);
 			Address primaryAddress = busAddresses.remove(0);
+			
 			try {
 				MemoryBlockUtils.createInitializedBlock(prog, false, primaryBlockName, primaryAddress,
 						romChunk.getInputStream(), romChunk.getLength(), "", provider.getAbsolutePath(), true, false,
 						true, log, monitor);
-			} catch (AddressOverflowException e) {
+			}
+			catch (AddressOverflowException e) {
 				throw new IllegalStateException("Invalid address range specified: start:" + primaryAddress + ", length:"
 						+ romChunk.getLength() + " - end address exceeds address space boundary!");
 			}
@@ -45,7 +50,7 @@ public class LoRomLoader implements RomInfoProvider {
 				String mirrorBlockName = getRomChunkMirrorName(romChunk, mirrorNum);
 				MemoryBlockUtils.createByteMappedBlock(prog, mirrorBlockName, mirrorAddress, primaryAddress,
 						(int) romChunk.getLength(), String.format("mirror of %s", primaryBlockName), "", true, false,
-						true, log);
+						true, false, log);
 				mirrorNum++;
 			}
 		}
@@ -82,10 +87,12 @@ public class LoRomLoader implements RomInfoProvider {
 		int rightBank = (int) ((rightAddr & 0xff_0000) >> 16);
 		int rightSmall = (int) (rightAddr & 0xffff);
 
+		//format: "rom_BB:AAAA-BB:AAAA"
 		return String.format("rom_%02x:%04x-%02x:%04x", leftBank, leftSmall, rightBank, rightSmall);
 	}
 
 	private static String getRomChunkMirrorName(RomChunk chunk, int mirrorNum) {
+		//format: "rom_BB:AAAA-BB:AAAA_mirror1"
 		return String.format("%s_mirror%d", getRomChunkPrimaryName(chunk), mirrorNum);
 	}
 
