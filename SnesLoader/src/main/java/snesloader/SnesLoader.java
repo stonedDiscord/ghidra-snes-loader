@@ -86,7 +86,9 @@ public class SnesLoader extends AbstractProgramLoader {
 			new RomInfo(RomKind.LO_ROM, true),
 			new RomInfo(RomKind.LO_ROM, false),
 			new RomInfo(RomKind.HI_ROM, true),
-			new RomInfo(RomKind.HI_ROM, false)};
+			new RomInfo(RomKind.HI_ROM, false),
+			new RomInfo(RomKind.EX_HI_ROM, true),
+			new RomInfo(RomKind.EX_HI_ROM, false)};
 
 		for (RomInfo rom : candidateRomKinds) {
 			if (rom.bytesLookValid(provider)) {

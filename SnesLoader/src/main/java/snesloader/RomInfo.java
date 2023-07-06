@@ -10,7 +10,8 @@ public class RomInfo {
 
 	public enum RomKind {
 		LO_ROM(new LoRomLoader()),
-		HI_ROM(new HiRomLoader());
+		HI_ROM(new HiRomLoader()),
+		EX_HI_ROM(new ExHiRomLoader());
 
 		private final RomInfoProvider infoProvider;
 
