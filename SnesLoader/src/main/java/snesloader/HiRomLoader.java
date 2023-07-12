@@ -33,8 +33,8 @@ public class HiRomLoader implements RomInfoProvider {
 			//get both the primary and mirrored (if applicable) address for each 32KiB chunk
 			List<Address> busAddresses = getBusAddressesForRomChunk(romChunk, busSpace);
 
-			String primaryBlockName = getRomChunkPrimaryName(romChunk);
 			Address primaryAddress = busAddresses.remove(0);
+			String primaryBlockName = getRomChunkPrimaryName(romChunk, primaryAddress);
 			
 			try {
 				MemoryBlockUtils.createInitializedBlock(prog, false, primaryBlockName, primaryAddress,
@@ -48,7 +48,7 @@ public class HiRomLoader implements RomInfoProvider {
 
 			int mirrorNum = 1;
 			for (Address mirrorAddress : busAddresses) {
-				String mirrorBlockName = getRomChunkMirrorName(romChunk, mirrorNum);
+				String mirrorBlockName = getRomChunkMirrorName(romChunk, mirrorNum, mirrorAddress);
 				MemoryBlockUtils.createByteMappedBlock(prog, mirrorBlockName, mirrorAddress, primaryAddress,
 						(int) romChunk.getLength(), String.format("mirror of %s", primaryBlockName), "", true, false,
 						true, false, log);
@@ -82,7 +82,7 @@ public class HiRomLoader implements RomInfoProvider {
 		return busAddresses;
 	}
 
-	private static String getRomChunkPrimaryName(RomChunk chunk) {
+	private static String getRomChunkPrimaryName(RomChunk chunk, Address address) {
 		long leftAddr = chunk.getRomAddresses().left;
 		int leftBank = (int) ((leftAddr & 0xff_0000) >> 16);
 		int leftSmall = (int) (leftAddr & 0xffff);
@@ -92,12 +92,15 @@ public class HiRomLoader implements RomInfoProvider {
 		int rightSmall = (int) (rightAddr & 0xffff);
 
 		//format: "rom_BB:AAAA-BB:AAAA"
-		return String.format("rom_%02x:%04x-%02x:%04x", leftBank, leftSmall, rightBank, rightSmall);
+		//return String.format("rom_%02x:%04x-%02x:%04x", leftBank, leftSmall, rightBank, rightSmall);
+		String mappedStartAddress = address.toString();
+		String mappedEndAddress = address.add(ROM_CHUNK_SIZE - 1).toString();
+		return String.format("%s-%s (rom_%02x:%04x-%02x:%04x)", mappedStartAddress, mappedEndAddress, leftBank, leftSmall, rightBank, rightSmall);
 	}
 
-	private static String getRomChunkMirrorName(RomChunk chunk, int mirrorNum) {
+	private static String getRomChunkMirrorName(RomChunk chunk, int mirrorNum, Address address) {
 		//format: "rom_BB:AAAA-BB:AAAA_mirror1"
-		return String.format("%s_mirror%d", getRomChunkPrimaryName(chunk), mirrorNum);
+		return String.format("%s_mirror%d", getRomChunkPrimaryName(chunk, address), mirrorNum);
 	}
 
 	@Override
