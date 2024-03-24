@@ -9,7 +9,7 @@
     <varnode space="stack" offset="1" size="2"/>
   </returnaddress>
   <default_proto>
-    <prototype name="__unknowncall" type="unknown" extrapop="0" stackshift="0" strategy="register">
+    <prototype name="__unknowncall" extrapop="0" stackshift="0" strategy="register">
       <input/>
       <output/>
     </prototype>
