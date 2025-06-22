@@ -38,3 +38,6 @@ SnesLoader/dist
 # local configuration
 SnesLoader/gradle.properties
 .vscode
+*.sla
+*.pdf
+*.sublime-*
