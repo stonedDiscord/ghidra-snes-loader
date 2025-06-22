@@ -34,3 +34,7 @@ SnesLoader/.settings
 SnesLoader/bin
 SnesLoader/build
 SnesLoader/dist
+
+# local configuration
+SnesLoader/gradle.properties
+.vscode
