@@ -25,9 +25,11 @@ jobs:
       with:
         version: 11.4
     - name: Build
+      working-directory: SnesLoader
       run: "gradle"
-    - name: Release
-      uses: shogo82148/actions-upload-release-asset@v1
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: "dist/ghidra_*_SNESloader.zip"
+        name: ghidra-snes-loader
+        path: |
+          SnesLoader/dist/*.zip
