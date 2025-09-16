@@ -19,11 +19,11 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: ${{env.GRADLE_VERSION}}
+        gradle-version: 'current'
     - name: Setup Ghidra
       uses: er28-0652/setup-ghidra@master
       with:
-        version: ${{vars.GHIDRA_BUILD_VERSION}}
+        version: 11.4
     - name: Build
       run: "gradle"
     - name: Release
