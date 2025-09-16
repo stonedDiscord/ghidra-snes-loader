@@ -4,15 +4,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK
       uses: actions/setup-java@v5
       with:
-        java-version: 17
+        java-version: 21
         distribution: 'temurin' # Eclipse JDK
         server-id: github
         settings-path: ${{ github.workspace }}
