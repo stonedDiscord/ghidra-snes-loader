@@ -20,7 +20,7 @@ jobs:
     - name: Setup Ghidra
       uses: er28-0652/setup-ghidra@master
       with:
-        version: 11.4.2
+        version: 12.0.2
     - name: Build
       working-directory: SnesLoader
       run: "gradle"
